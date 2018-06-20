@@ -19,6 +19,18 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>lco.demo.docker.Main</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <executions>
                     <execution>
@@ -54,9 +66,39 @@
                                 </wait>
                             </run>
                         </image>
+                        <image>
+                            <alias>app</alias>
+                            <name>simple-app:local</name>
+                            <build>
+                                <dockerFile>${project.basedir}/src/main/docker/Dockerfile
+                                </dockerFile>
+                                <args>
+                                    <JAR_FILENAME>${project.name}-${project.version}.jar
+                                    </JAR_FILENAME>
+                                </args>
+                                <assembly>
+                                    <descriptorRef>artifact-with-dependencies</descriptorRef>
+                                </assembly>
+                            </build>
+                            <run>
+                                <ports>
+                                    <port>8080:8080</port>
+                                </ports>
+                                <wait>
+                                    <log>Up and running!</log>
+                                </wait>
+                            </run>
+                        </image>
                     </images>
                 </configuration>
                 <executions>
+                    <execution>
+                        <id>build-app-image</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
                     <execution>
                         <id>before-it</id>
                         <phase>pre-integration-test</phase>

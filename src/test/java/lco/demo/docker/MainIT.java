@@ -18,15 +18,26 @@ public class MainIT
     @Test
     public void testPostgresIsReachable()
     {
+        checkSocketListening("localhost", 5432, "Postgres");
+    }
+
+    @Test
+    public void testAppIsReachable()
+    {
+        checkSocketListening("localhost", 8080, "App");
+    }
+
+    private static void checkSocketListening(final String hostname, final int port, String label)
+    {
         final Socket s = new Socket();
         try
         {
-            s.connect(new InetSocketAddress("localhost", 5432), 5 * 1000);
-            System.out.println("[Postgres is reachable]");
+            s.connect(new InetSocketAddress(hostname, port), 5 * 1000);
+            System.out.println("[" + label + " is reachable]");
         }
         catch (Exception e)
         {
-            System.err.println("Postgres not reachable: " + e.getMessage());
+            System.err.println("[" + label + " not reachable: " + e.getMessage());
             fail();
         }
         finally
